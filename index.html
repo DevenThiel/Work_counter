@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elapsed Time Calculator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #222; /* Default light background */
+            color: #eee; /* Default dark text color */
+            transition: background-color 1.0s, color 1.0s; /* Add a smooth transition */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            background-color: #333; /* Default light input background */
+            color: #eee; /* Default dark input text color */
+            border: 1px solid #555;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #4CAF50; 
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #time, #calculated {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        /* Dark Theme Styles */
+        body.light-theme {
+            background-color: #fff; 
+            color: #333; 
+        }
+
+        body.light-theme input[type="number"] {
+            background-color: #fff;
+            color: #333; 
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="toggleTheme">Toggle Theme</button> 
+        <div>
+            <label for="rate">Rate Per Hour:</label>
+            <input type="number" id="rate" value="1">
+        </div>
+        <button id="start">Start</button>
+        <button id="stop" disabled>Stop</button>
+        <div id="time">00:00:00</div>
+        <div id="calculated">Earned: $0</div>
+    </div>
+
+    <script>
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval = null;
+        let isLightTheme = false;
+
+        const timeDisplay = document.getElementById("time");
+        const calculatedDisplay = document.getElementById("calculated");
+
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${hours}:${minutes}:${secs}`;
+        }
+
+        function updateDisplay() {
+            timeDisplay.textContent = formatTime(elapsedTime);
+            const rate = parseFloat(document.getElementById("rate").value);
+            calculatedDisplay.textContent = `Earned: \$${(rate / 3600 * elapsedTime).toFixed(2)}`;
+        }
+
+        document.getElementById("start").addEventListener("click", () => {
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+                updateDisplay();
+            }, 1000);
+            document.getElementById("start").disabled = true;
+            document.getElementById("stop").disabled = false;
+        });
+
+        document.getElementById("stop").addEventListener("click", () => {
+            clearInterval(timerInterval);
+            document.getElementById("start").disabled = false;
+            document.getElementById("stop").disabled = true;
+        });
+
+        document.getElementById('toggleTheme').addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            isLightTheme = !isLightTheme;  
+        });
+    </script>
+</body>
+</html>
